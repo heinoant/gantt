@@ -605,6 +605,7 @@ var Gantt = (function () {
                 ry: this.corner_radius,
                 class: 'bar-progress',
                 append_to: this.bar_group,
+                style: 'fill: ' + this.task.color,
             });
 
             animateSVG(this.$bar_progress, 'width', 0, this.progress_width);
@@ -1301,11 +1302,7 @@ var Gantt = (function () {
                 this.gantt_start = date_utils.add(this.gantt_start, -7, 'day');
                 this.gantt_end = date_utils.add(this.gantt_end, 7, 'day');
             } else if (this.view_is(VIEW_MODE.MONTH)) {
-                this.gantt_start = date_utils.start_of(
-                    this.gantt_start,
-                    -2,
-                    'year'
-                );
+                this.gantt_start = date_utils.add(this.gantt_start, -2, 'year');
                 this.gantt_end = date_utils.add(this.gantt_end, 2, 'year');
             } else if (this.view_is(VIEW_MODE.YEAR)) {
                 this.gantt_start = date_utils.add(this.gantt_start, -2, 'year');

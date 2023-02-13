@@ -35,14 +35,15 @@
 				end: '2018-10-08',
 				name: 'Redesign website',
 				id: "Task 0",
-				progress: 20
+				progress: 50,
+				color: 'green'
 			},
 			{
 				start: '2018-10-03',
 				end: '2018-10-06',
 				name: 'Write new content',
 				id: "Task 1",
-				progress: 5,
+				progress: 60,
 				dependencies: 'Task 0'
 			},
 			{
@@ -50,8 +51,9 @@
 				end: '2018-10-08',
 				name: 'Apply new styles',
 				id: "Task 2",
-				progress: 10,
-				dependencies: 'Task 1'
+				progress: 100,
+				dependencies: 'Task 1',
+				color: 'blue'
 			},
 			{
 				start: '2018-10-08',
@@ -78,13 +80,6 @@
 				dependencies: 'Task 4',
 				custom_class: 'bar-milestone'
 			},
-			{
-				start: '2014-01-05',
-				end: '2019-10-12',
-				name: 'Long term task',
-				id: "Task 6",
-				progress: 0
-			}
 		]
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
 			on_click: task => {

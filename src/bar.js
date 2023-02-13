@@ -103,6 +103,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar-progress',
             append_to: this.bar_group,
+            style: 'fill: ' + this.task.color,
         });
 
         animateSVG(this.$bar_progress, 'width', 0, this.progress_width);
