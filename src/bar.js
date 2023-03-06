@@ -297,6 +297,7 @@ export default class Bar {
         this.update_label_position();
         this.update_handle_position();
         this.update_progressbar_position();
+        this.update_underlying_bar_position();
         this.update_arrow_position();
     }
 
@@ -429,6 +430,13 @@ export default class Bar {
             'width',
             this.$bar.getWidth() * (this.task.progress / 100)
         );
+    }
+
+    update_underlying_bar_position() {
+        const underBar = this.group.querySelector('.bar');
+
+        underBar.setAttribute('x', this.$bar.getX());
+        underBar.setAttribute('width', this.$bar.getWidth());
     }
 
     update_label_position() {
