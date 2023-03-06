@@ -9,6 +9,34 @@ export default class Bar {
         this.bind();
     }
 
+    pickColorBasedOnBG(bgColor) {
+        if (bgColor) {
+            const hex = bgColor.toString(16);
+            const color = bgColor.charAt(0) === '#' ? hex.substring(1, 7) : hex;
+            const r = parseInt(color.substring(0, 2), 16);
+            const g = parseInt(color.substring(2, 4), 16);
+            const b = parseInt(color.substring(4, 6), 16);
+            return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? '#333' : '#f5f5f5';
+        } else {
+            return '#f5f5f5';
+        }
+    }
+
+    pickStripeColorBasedOnBG(bgColor) {
+        if (bgColor) {
+            const hex = bgColor.toString(16);
+            const color = bgColor.charAt(0) === '#' ? hex.substring(1, 7) : hex;
+            const r = parseInt(color.substring(0, 2), 16);
+            const g = parseInt(color.substring(2, 4), 16);
+            const b = parseInt(color.substring(4, 6), 16);
+            return r * 0.299 + g * 0.587 + b * 0.114 > 250
+                ? 'lightgrey'
+                : 'white';
+        } else {
+            return 'white';
+        }
+    }
+
     set_defaults(gantt, task) {
         this.action_completed = false;
         this.gantt = gantt;
@@ -68,9 +96,32 @@ export default class Bar {
 
     draw() {
         this.draw_bar();
+        this.draw_barPattern();
         this.draw_progress_bar();
         this.draw_label();
         this.draw_resize_handles();
+    }
+
+    draw_barPattern() {
+        this.$bar = createSVG('rect', {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+            rx: this.corner_radius,
+            ry: this.corner_radius,
+            class: 'bar-pattern',
+            append_to: this.bar_group,
+            style:
+                'mask: url(stripe.svg); fill: ' +
+                this.pickStripeColorBasedOnBG(this.task.color),
+        });
+
+        animateSVG(this.$bar, 'width', 0, this.width);
+
+        if (this.invalid) {
+            this.$bar.classList.add('bar-invalid');
+        }
     }
 
     draw_bar() {
@@ -83,6 +134,10 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar',
             append_to: this.bar_group,
+            style:
+                'fill: ' +
+                this.task.color +
+                '; stroke-width:1; stroke:lightgrey; ',
         });
 
         animateSVG(this.$bar, 'width', 0, this.width);
@@ -116,6 +171,7 @@ export default class Bar {
             innerHTML: this.task.name,
             class: 'bar-label',
             append_to: this.bar_group,
+            style: 'fill: ' + this.pickColorBasedOnBG(this.task.color),
         });
         // labels get BBox in the next tick
         requestAnimationFrame(() => this.update_label_position());

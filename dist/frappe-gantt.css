@@ -31,12 +31,26 @@
   stroke: #666;
   stroke-width: 1.4;
 }
-.gantt .bar {
+.gantt rect.bar {
   fill: #b8c2cc;
   stroke: #8D99A6;
   stroke-width: 0;
   transition: stroke-width 0.3s ease;
   user-select: none;
+  filter: opacity(0.4);
+}
+.gantt rect.bar-pattern {
+  fill: white;
+  stroke: #8D99A6;
+  stroke-width: 0;
+  transition: stroke-width 0.3s ease;
+  user-select: none;
+  filter: opacity(0.33);
+}
+.gantt rect.bar::after {
+  content: "testisti";
+  position: relative;
+  z-index: 123;
 }
 .gantt .bar-progress {
   fill: #f78918;
@@ -51,14 +65,12 @@
   fill: #555;
 }
 .gantt .bar-label {
-  fill: #fff;
   dominant-baseline: central;
   text-anchor: middle;
-  font-size: 12px;
-  font-weight: lighter;
+  font-size: 0.8rem;
 }
 .gantt .bar-label.big {
-  fill: #555;
+  fill: #333 !important;
   text-anchor: start;
 }
 .gantt .handle {

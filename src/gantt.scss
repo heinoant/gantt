@@ -10,6 +10,7 @@ $text-color: #333 !default;
 $orange: #f78918 !default;
 $handle-color: #ddd !default;
 
+
 .gantt {
 
 	.grid-background {
@@ -47,12 +48,26 @@ $handle-color: #ddd !default;
 		stroke-width: 1.4;
 	}
 
-	.bar {
+	rect.bar {
 		fill: $bar-color;
 		stroke: $bar-stroke;
 		stroke-width: 0;
 		transition: stroke-width .3s ease;
 		user-select: none;
+		filter: opacity(0.4)
+	}
+	rect.bar-pattern {
+		fill: white;
+		stroke: $bar-stroke;
+		stroke-width: 0;
+		transition: stroke-width .3s ease;
+		user-select: none;
+		filter: opacity(0.33)
+	}
+	rect.bar::after {
+		content: 'testisti';
+		position: relative;
+		z-index: 123;
 	}
 	.bar-progress {
 		fill: $orange;
@@ -68,14 +83,12 @@ $handle-color: #ddd !default;
 		}
 	}
 	.bar-label {
-		fill: #fff;
 		dominant-baseline: central;
 		text-anchor: middle;
-		font-size: 12px;
-		font-weight: lighter;
+		font-size: 0.8rem;
 
 		&.big {
-			fill: $text-light;
+			fill: $text-color !important;
 			text-anchor: start;
 		}
 	}
