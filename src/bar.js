@@ -112,9 +112,7 @@ export default class Bar {
             ry: this.corner_radius,
             class: 'bar-pattern',
             append_to: this.bar_group,
-            style:
-                'mask: url(stripe.svg); fill: ' +
-                this.pickStripeColorBasedOnBG(this.task.color),
+            style: 'fill: ' + this.pickStripeColorBasedOnBG(this.task.color),
         });
 
         animateSVG(this.$bar, 'width', 0, this.width);

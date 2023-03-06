@@ -62,12 +62,8 @@ $handle-color: #ddd !default;
 		stroke-width: 0;
 		transition: stroke-width .3s ease;
 		user-select: none;
-		filter: opacity(0.33)
-	}
-	rect.bar::after {
-		content: 'testisti';
-		position: relative;
-		z-index: 123;
+		filter: opacity(0.33);
+		mask: url(stripe.svg);
 	}
 	.bar-progress {
 		fill: $orange;

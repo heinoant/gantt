@@ -46,11 +46,7 @@
   transition: stroke-width 0.3s ease;
   user-select: none;
   filter: opacity(0.33);
-}
-.gantt rect.bar::after {
-  content: "testisti";
-  position: relative;
-  z-index: 123;
+  mask: url(stripe.svg);
 }
 .gantt .bar-progress {
   fill: #f78918;
