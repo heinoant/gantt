@@ -19,6 +19,10 @@
 		.heading {
 			text-align: center;
 		}
+		.gantt-target {
+			width: auto;
+			height: auto;
+		}
 	</style>
 	<link rel="stylesheet" href="dist/frappe-gantt.css" />
 	<script src="dist/frappe-gantt.js"></script>
@@ -26,6 +30,8 @@
 <body>
 	<div class="container">
 		<h2 class="heading">Interactive Gantt Chart entirely made in SVG!</h2>
+		<button onclick="gantt_chart.scale_view_mode(3)">zoomIn</button>
+		<button onclick="gantt_chart.scale_view_mode(-3)">zoomOut</button>
 		<div class="gantt-target"></div>
 	</div>
 	<script>
@@ -54,7 +60,7 @@
 				id: "Task 2",
 				progress: 50,
 				dependencies: 'Task 1',
-				color: '#000'
+				color: 'orange'
 			},
 			{
 				start: '2018-10-08',
@@ -238,11 +244,12 @@
 			bar_corner_radius: 3,
 			arrow_curve: 5,
 			padding: 15,
-			view_mode: 'Week',
+			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
 			sortable: true
 		});
+
 		console.log(gantt_chart);
 	</script>
 </body>

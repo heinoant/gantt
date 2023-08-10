@@ -204,6 +204,12 @@ export default class Gantt {
         }
     }
 
+    scale_view_mode(zoomValue) {
+        this.options.column_width += 2 * zoomValue;
+        this.options.bar_height += zoomValue;
+        this.render();
+    }
+
     setup_dates() {
         this.setup_gantt_dates();
         this.setup_date_values();
