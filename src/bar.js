@@ -96,13 +96,14 @@ export default class Bar {
 
     draw() {
         this.draw_bar();
-        this.draw_barPattern();
+        this.draw_carets();
+        this.draw_bar_pattern();
         this.draw_progress_bar();
         this.draw_label();
         this.draw_resize_handles();
     }
 
-    draw_barPattern() {
+    draw_bar_pattern() {
         this.$bar = createSVG('rect', {
             x: this.x,
             y: this.y,
@@ -207,6 +208,28 @@ export default class Bar {
             this.$handle_progress = createSVG('polygon', {
                 points: this.get_progress_polygon_points().join(','),
                 class: 'handle progress',
+                append_to: this.handle_group,
+            });
+        }
+    }
+
+    draw_carets() {
+        const bar = this.$bar;
+        if (this.gantt.get_all_dependent_tasks(this.task.id).length != 0) {
+            const caretWidth = 12;
+            const caretHeight = 6;
+            const caretX = bar.getX() + bar.getWidth() - 20;
+            const caretY = bar.getY() + this.height / 2;
+
+            const caretPoints = [
+                `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
+                `${caretX},${caretY + caretHeight / 2}`,
+                `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
+            ];
+
+            createSVG('polygon', {
+                points: caretPoints.join(' '),
+                class: 'caret',
                 append_to: this.handle_group,
             });
         }
@@ -473,6 +496,22 @@ export default class Bar {
         this.handle_group
             .querySelector('.handle.right')
             .setAttribute('y', bar.getY() + 1);
+        if (this.handle_group.querySelector('.caret')) {
+            const caretElement = this.handle_group.querySelector('.caret');
+
+            const caretWidth = 12;
+            const caretHeight = 6;
+            const caretX = bar.getX() + bar.getWidth() - 20;
+            const caretY = bar.getY() + this.height / 2;
+
+            const caretPoints = [
+                `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
+                `${caretX},${caretY + caretHeight / 2}`,
+                `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
+            ];
+
+            caretElement.setAttribute('points', caretPoints.join(' '));
+        }
         const handle = this.group.querySelector('.handle.progress');
         handle &&
             handle.setAttribute('points', this.get_progress_polygon_points());

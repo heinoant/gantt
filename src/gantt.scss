@@ -13,6 +13,10 @@ $handle-color: #ddd !default;
 
 .gantt {
 
+	.collapsed{
+		display: none;
+	}
+
 	.grid-background {
 		fill: none;
 	}

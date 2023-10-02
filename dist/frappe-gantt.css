@@ -1,3 +1,6 @@
+.gantt .collapsed {
+  display: none;
+}
 .gantt .grid-background {
   fill: none;
 }

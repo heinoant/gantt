@@ -3,7 +3,6 @@ import { $, createSVG } from './svg_utils';
 import Bar from './bar';
 import Arrow from './arrow';
 import Popup from './popup';
-
 import './gantt.scss';
 
 const VIEW_MODE = {
@@ -93,13 +92,17 @@ export default class Gantt {
     }
 
     setup_tasks(tasks) {
-        // prepare tasks
-        this.tasks = tasks.map((task, i) => {
-            // convert to Date objects
+        this.originalTasks = [];
+        this.originalTasks = tasks;
+
+        const visibleTasks = this.originalTasks.filter(
+            (task) => task.visible || task.visible === undefined
+        );
+
+        this.tasks = visibleTasks.map((task, i) => {
             task._start = date_utils.parse(task.start);
             task._end = date_utils.parse(task.end);
 
-            // make task invalid if duration too large
             if (date_utils.diff(task._end, task._start, 'year') > 10) {
                 task.end = null;
             }
@@ -155,6 +158,18 @@ export default class Gantt {
         });
 
         this.setup_dependencies();
+        this.setup_ancestors();
+    }
+
+    updateTaskVisibility(task, visibility) {
+        console.log(task);
+        task.visible = visibility;
+
+        // Also update visibility in the original tasks array
+        const originalTask = this.originalTasks.find((t) => t.id === task.id);
+        if (originalTask) {
+            originalTask.visible = visibility;
+        }
     }
 
     setup_dependencies() {
@@ -163,6 +178,22 @@ export default class Gantt {
             for (let d of t.dependencies) {
                 this.dependency_map[d] = this.dependency_map[d] || [];
                 this.dependency_map[d].push(t.id);
+            }
+        }
+    }
+
+    //make a map of tasks to their reverse dependencies with ancestors
+    setup_ancestors() {
+        this.ancestor_map = {};
+        for (let t of this.tasks) {
+            for (let d of t.dependencies) {
+                this.ancestor_map[t.id] = this.ancestor_map[t.id] || [];
+                this.ancestor_map[t.id].push(d);
+                if (this.ancestor_map[d]) {
+                    this.ancestor_map[t.id] = this.ancestor_map[t.id].concat(
+                        this.ancestor_map[d]
+                    );
+                }
             }
         }
     }
@@ -282,6 +313,7 @@ export default class Gantt {
 
     render() {
         this.clear();
+
         this.setup_layers();
         this.make_grid();
         this.make_dates();
@@ -717,6 +749,7 @@ export default class Gantt {
         let is_resizing_right = false;
         let parent_bar_id = null;
         let bars = []; // instanceof Bars, the dragged bar and its children
+        let parent_bars = [];
         const min_y = this.options.header_height;
         const max_y =
             this.options.header_height +
@@ -727,6 +760,48 @@ export default class Gantt {
         function action_in_progress() {
             return is_dragging || is_resizing_left || is_resizing_right;
         }
+        // Event listener for clicking on a caret
+        $.on(this.$svg, 'click', '.caret', (e, caretElement) => {
+            console.log('caret clicked');
+            const parentBarWrapper = caretElement.closest('.bar-wrapper');
+            if (parentBarWrapper) {
+                const parentTaskId = parentBarWrapper.getAttribute('data-id');
+
+                const dependentTasks =
+                    this.get_all_dependent_tasks(parentTaskId);
+
+                dependentTasks.forEach((taskId) => {
+                    const dependentBar = this.get_bar(taskId);
+                    console.log(dependentBar);
+                    if (dependentBar) {
+                        dependentBar.group.classList.toggle('collapsed');
+
+                        const matchingArrows = document.querySelectorAll(
+                            `[data-from="${parentTaskId}"][data-to="${taskId}"],` +
+                                `[data-from="${taskId}"][data-to="${parentTaskId}"]`
+                        );
+                        matchingArrows.forEach((arrow) => {
+                            arrow.classList.toggle('collapsed');
+                        });
+                        console.log(matchingArrows);
+
+                        // Hide all children's arrows
+                        const childrenTasks =
+                            this.get_all_dependent_tasks(taskId);
+                        childrenTasks.forEach((childTaskId) => {
+                            const childMatchingArrows =
+                                document.querySelectorAll(
+                                    `[data-from="${taskId}"][data-to="${childTaskId}"],` +
+                                        `[data-from="${childTaskId}"][data-to="${taskId}"]`
+                                );
+                            childMatchingArrows.forEach((childArrow) => {
+                                childArrow.classList.toggle('collapsed');
+                            });
+                        });
+                    }
+                });
+            }
+        });
 
         $.on(this.$svg, 'mousedown', '.bar-wrapper, .handle', (e, element) => {
             const bar_wrapper = $.closest('.bar-wrapper', element);
@@ -762,6 +837,17 @@ export default class Gantt {
                 $bar.finaldy = 0;
                 return bar;
             });
+            parent_bars = this.get_all_parent_tasks(parent_bar_id).map(
+                (bar) => {
+                    const $bar = bar.$bar;
+                    $bar.ox = $bar.getX();
+                    $bar.oy = $bar.getY();
+                    $bar.owidth = $bar.getWidth();
+                    $bar.finaldx = 0;
+                    $bar.finaldy = 0;
+                    return bar;
+                }
+            );
         });
 
         $.on(this.$svg, 'mousemove', (e) => {
@@ -804,8 +890,48 @@ export default class Gantt {
                 });
             }
 
-            // update children
+            // update project and tag bars when resizing or moving children
+            parent_bars.forEach((ancestor_bar) => {
+                if (
+                    ancestor_bar.task.type == 'project' ||
+                    ancestor_bar.task.type == 'tag'
+                ) {
+                    let max_x = 0;
+                    let second_x = 0;
+                    this.get_all_dependent_tasks(ancestor_bar.task.id).forEach(
+                        (bar_id) => {
+                            const bar = this.get_bar(bar_id);
 
+                            if (bar.x + bar.width > max_x) {
+                                second_x = max_x;
+                                max_x = bar.x + bar.width;
+                            } else if (bar.x + bar.width > second_x) {
+                                second_x = bar.x + bar.width;
+                            }
+                        }
+                    );
+
+                    if (
+                        ancestor_bar.x +
+                            ancestor_bar.width +
+                            bar_being_dragged.$bar.finaldx >=
+                            max_x ||
+                        (bar_being_dragged.$bar.ox >= ancestor_bar.x &&
+                            bar_being_dragged.$bar.finaldx +
+                                bar_being_dragged.$bar.ox +
+                                bar_being_dragged.$bar.owidth >=
+                                second_x)
+                    ) {
+                        ancestor_bar.update_bar_position({
+                            width:
+                                ancestor_bar.width +
+                                bar_being_dragged.$bar.finaldx,
+                        });
+                    }
+                }
+            });
+
+            // update children
             bars.forEach((bar) => {
                 if (bar.task.id === parent_bar_id) {
                     return;
@@ -823,6 +949,7 @@ export default class Gantt {
                     });
                 }
             });
+
             // update y pos
             if (
                 this.options.sortable &&
@@ -946,6 +1073,36 @@ export default class Gantt {
         }
 
         return out.filter(Boolean);
+    }
+
+    get_all_parent_tasks(task_id) {
+        const out = [];
+        const to_process = [task_id];
+        const processedTasks = new Set();
+
+        while (to_process.length) {
+            const deps = to_process.reduce((acc, curr) => {
+                acc = acc.concat(this.ancestor_map[curr] || []);
+                return acc;
+            }, []);
+
+            for (const dep of deps) {
+                if (!processedTasks.has(dep)) {
+                    processedTasks.add(dep);
+                    const taskObject = this.get_bar(dep);
+
+                    if (taskObject) {
+                        out.push(taskObject);
+                    }
+
+                    to_process.push(dep);
+                }
+            }
+
+            to_process.shift();
+        }
+
+        return out;
     }
 
     get_snap_position(dx) {

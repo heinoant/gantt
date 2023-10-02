@@ -37,16 +37,17 @@
 	<script>
 		var tasks = [
 			{
-				start: '2018-10-01',
-				end: '2018-11-08',
-				name: 'Redesign website',
+				start: '2018-10-03',
+				end: '2018-11-20',
+				name: 'Project 123',
 				id: "Task 0",
 				progress: 50,
-				color: '#92d6d0'
+				color: '#92d6d0',
+				type: 'project'
 			},
 			{
 				start: '2018-10-03',
-				end: '2018-11-06',
+				end: '2018-11-01',
 				name: 'Write new content',
 				id: "Task 1",
 				progress: 50,
@@ -80,8 +81,8 @@
 				color: '#000',
 			},
 			{
-				start: '2018-10-11',
-				end: '2018-10-11',
+				start: '2018-11-18',
+				end: '2018-11-20',
 				name: 'Go Live!',
 				id: "Task 5",
 				progress: 0,
@@ -89,153 +90,28 @@
 				custom_class: 'bar-milestone'
 			},
 			{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
+				start: '2018-10-10',
+				end: '2018-10-20',
+				name: 'Independent Task',
+				id: "Task 6",
 				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
+				color: '#92d6d0',
 			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
-						{
-				start: '2018-10-11',
-				end: '2018-10-11',
-				name: 'Go Live!',
-				id: "Task 5",
-				progress: 0,
-				dependencies: 'Task 4',
-				custom_class: 'bar-milestone'
-			},
+
+
 		]
 		var gantt_chart = new Gantt(".gantt-target", tasks, {
 			on_click: task => {
-				console.log(task);
+
 			},
 			on_date_change: (task, start, end) => {
-				console.log(task, start, end);
+
 			},
 			on_progress_change: (task, progress) => {
-				console.log(task, progress);
+
 			},
 			on_view_change: (mode) => {
-				console.log(mode);
+
 			},
 			header_height: 50,
 			column_width: 	10,
@@ -247,10 +123,10 @@
 			view_mode: 'Day',
 			date_format: 'YYYY-MM-DD',
 			custom_popup_html: null,
-			sortable: true
+			sortable: false
 		});
 
-		console.log(gantt_chart);
+
 	</script>
 </body>
 </html>
