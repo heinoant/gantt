@@ -6,7 +6,7 @@
 }
 .gantt .grid-header {
   fill: #ffffff;
-  stroke: #e0e0e0;
+  stroke: #b6b6b6;
   stroke-width: 1.4;
 }
 .gantt .grid-row {
@@ -19,7 +19,7 @@
   stroke: #ebeff2;
 }
 .gantt .tick {
-  stroke: #e0e0e0;
+  stroke: #b6b6b6;
   stroke-width: 0.2;
 }
 .gantt .tick.thick {
@@ -33,6 +33,9 @@
   fill: none;
   stroke: #666;
   stroke-width: 1.4;
+}
+.gantt .caret {
+  padding: 5px;
 }
 .gantt rect.bar {
   fill: #b8c2cc;

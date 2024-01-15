@@ -1,6 +1,6 @@
 $bar-color: #b8c2cc !default;
 $bar-stroke: #8D99A6 !default;
-$border-color: #e0e0e0 !default;
+$border-color: #b6b6b6 !default;
 $light-bg: #f5f5f5 !default;
 $light-border-color: #ebeff2 !default;
 $light-yellow: #fcf8e3 !default;
@@ -50,6 +50,10 @@ $handle-color: #ddd !default;
 		fill: none;
 		stroke: $text-muted;
 		stroke-width: 1.4;
+	}
+
+	.caret{
+		padding: 5px;
 	}
 
 	rect.bar {

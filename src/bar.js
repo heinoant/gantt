@@ -16,7 +16,7 @@ export default class Bar {
             const r = parseInt(color.substring(0, 2), 16);
             const g = parseInt(color.substring(2, 4), 16);
             const b = parseInt(color.substring(4, 6), 16);
-            return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? '#333' : '#f5f5f5';
+            return r * 0.299 + g * 0.587 + b * 0.114 > 170 ? '#333' : '#f5f5f5';
         } else {
             return '#f5f5f5';
         }
@@ -96,10 +96,10 @@ export default class Bar {
 
     draw() {
         this.draw_bar();
-        this.draw_carets();
         this.draw_bar_pattern();
         this.draw_progress_bar();
         this.draw_label();
+        this.draw_carets();
         this.draw_resize_handles();
     }
 
@@ -215,24 +215,35 @@ export default class Bar {
 
     draw_carets() {
         const bar = this.$bar;
-        if (this.gantt.get_all_dependent_tasks(this.task.id).length != 0) {
-            const caretWidth = 12;
-            const caretHeight = 6;
-            const caretX = bar.getX() + bar.getWidth() - 20;
-            const caretY = bar.getY() + this.height / 2;
+        setTimeout(() => {
+            const label = this.group.querySelector('.bar-label');
+            console.log(label.getBBox().width);
+            if (
+                this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
+                bar.getWidth() - label.getBBox().width > 40
+            ) {
+                const caretWidth = 12;
+                const caretHeight = 6;
+                const caretX = bar.getX() + bar.getWidth() - 20;
+                const caretY = bar.getY() + this.height / 2;
 
-            const caretPoints = [
-                `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
-                `${caretX},${caretY + caretHeight / 2}`,
-                `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
-            ];
+                const caretPoints = [
+                    `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
+                    `${caretX},${caretY + caretHeight / 2}`,
+                    `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
+                ];
 
-            createSVG('polygon', {
-                points: caretPoints.join(' '),
-                class: 'caret',
-                append_to: this.handle_group,
-            });
-        }
+                createSVG('polygon', {
+                    points: caretPoints.join(' '),
+                    class: 'caret',
+                    append_to: this.handle_group,
+                    style:
+                        'fill: ' +
+                        this.pickColorBasedOnBG(this.task.color) +
+                        '; stroke:transparent; stroke-width:0.1rem; ',
+                });
+            }
+        }, 1);
     }
 
     get_progress_polygon_points() {

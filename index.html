@@ -30,8 +30,8 @@
 <body>
 	<div class="container">
 		<h2 class="heading">Interactive Gantt Chart entirely made in SVG!</h2>
-		<button onclick="gantt_chart.scale_view_mode(3)">zoomIn</button>
-		<button onclick="gantt_chart.scale_view_mode(-3)">zoomOut</button>
+		<button onclick="gantt_chart.scale_view_mode(1)">zoomIn</button>
+		<button onclick="gantt_chart.scale_view_mode(-1)">zoomOut</button>
 		<div class="gantt-target"></div>
 	</div>
 	<script>
@@ -61,7 +61,7 @@
 				id: "Task 2",
 				progress: 50,
 				dependencies: 'Task 1',
-				color: 'orange'
+				color: '#eda62b'
 			},
 			{
 				start: '2018-10-08',
