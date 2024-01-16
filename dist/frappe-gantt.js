@@ -719,7 +719,7 @@ var Gantt = (function () {
             const bar = this.$bar;
             setTimeout(() => {
                 const label = this.group.querySelector('.bar-label');
-                console.log(label.getBBox().width);
+
                 if (
                     this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
                     bar.getWidth() - label.getBBox().width > 40
@@ -1357,7 +1357,7 @@ var Gantt = (function () {
 
                 return task;
             });
-            console.log(this.visible_tasks);
+
             this.setup_dependencies();
             this.setup_ancestors();
         }
@@ -1913,7 +1913,6 @@ var Gantt = (function () {
             const middle_date = new Date(this.gantt_start.getTime() + time_offset);
 
             this.current_location = middle_date;
-            console.log(this.current_location);
         }
 
         set_scroll_position() {
@@ -2033,20 +2032,29 @@ var Gantt = (function () {
             function action_in_progress() {
                 return is_dragging || is_resizing_left || is_resizing_right;
             }
-            // Event listener for clicking on a caret
+            // Event listener for clicking on a caret. Toggles collapse
             $.on(this.$svg, 'click', '.caret', (e, caretElement) => {
-                console.log('caret clicked');
+                this.hide_popup();
                 const parentBarWrapper = caretElement.closest('.bar-wrapper');
                 if (parentBarWrapper) {
                     const parentTaskId = parentBarWrapper.getAttribute('data-id');
-
+                    const parentBar = this.get_task(parentTaskId);
                     const dependentTasks =
                         this.get_all_dependent_tasks(parentTaskId);
+
+                    if (parentBar.collapsed) {
+                        parentBar.collapsed = false;
+                    } else {
+                        parentBar.collapsed = true;
+                    }
 
                     dependentTasks.forEach((task_id) => {
                         const task = this.get_task(task_id, this.tasks);
 
-                        if (task.visible || task.visible === undefined) {
+                        if (
+                            parentBar.collapsed == true ||
+                            this.get_task(task.dependencies[0]).collapsed == true
+                        ) {
                             task.visible = false;
                         } else {
                             task.visible = true;

@@ -217,7 +217,7 @@ export default class Bar {
         const bar = this.$bar;
         setTimeout(() => {
             const label = this.group.querySelector('.bar-label');
-            console.log(label.getBBox().width);
+
             if (
                 this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
                 bar.getWidth() - label.getBBox().width > 40
