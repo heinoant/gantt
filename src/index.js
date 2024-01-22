@@ -995,7 +995,7 @@ export default class Gantt {
                     ) {
                         ancestor_bar.update_bar_position({
                             width:
-                                ancestor_bar.width +
+                                ancestor_bar.$bar.owidth +
                                 bar_being_dragged.$bar.finaldx,
                         });
                     }

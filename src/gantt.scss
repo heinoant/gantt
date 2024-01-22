@@ -89,6 +89,7 @@ $handle-color: #ddd !default;
 	.bar-label {
 		dominant-baseline: central;
 		text-anchor: middle;
+		user-select: none;
 		font-size: 0.8rem;
 
 		&.big {

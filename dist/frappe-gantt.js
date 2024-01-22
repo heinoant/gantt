@@ -812,6 +812,7 @@ var Gantt = (function () {
 
         update_bar_position({ x = null, width = null, y = null }) {
             const bar = this.$bar;
+
             if (x) {
                 // get all x values of parent task
                 const xs = this.task.dependencies.map((dep) => {
@@ -819,9 +820,9 @@ var Gantt = (function () {
                 });
                 // child task must not go before parent
                 const valid_x = xs.reduce((prev, curr) => {
-                    return x >= curr;
-                }, x);
-                if (!valid_x) {
+                    return prev && x >= curr;
+                }, true);
+                if (!valid_x && x) {
                     width = null;
                     return;
                 }
@@ -2185,7 +2186,7 @@ var Gantt = (function () {
                         ) {
                             ancestor_bar.update_bar_position({
                                 width:
-                                    ancestor_bar.width +
+                                    ancestor_bar.$bar.owidth +
                                     bar_being_dragged.$bar.finaldx,
                             });
                         }
