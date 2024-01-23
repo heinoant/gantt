@@ -2158,38 +2158,29 @@ var Gantt = (function () {
                         ancestor_bar.task.type == 'project' ||
                         ancestor_bar.task.type == 'tag'
                     ) {
-                        let max_x = 0;
-                        let second_x = 0;
+                        let max_x = -Infinity;
+                        let min_x = Infinity;
                         this.get_all_dependent_tasks(ancestor_bar.task.id).forEach(
                             (bar_id) => {
                                 const bar = this.get_bar(bar_id);
-
-                                if (bar.x + bar.width > max_x) {
-                                    second_x = max_x;
-                                    max_x = bar.x + bar.width;
-                                } else if (bar.x + bar.width > second_x) {
-                                    second_x = bar.x + bar.width;
-                                }
+                                if (bar.$bar.getX() < min_x)
+                                    min_x = bar.$bar.getX();
+                                if (bar.$bar.getWidth() + bar.$bar.getX() > max_x)
+                                    max_x = bar.$bar.getWidth() + bar.$bar.getX();
                             }
                         );
-
-                        if (
-                            ancestor_bar.x +
-                                ancestor_bar.width +
-                                bar_being_dragged.$bar.finaldx >=
-                                max_x ||
-                            (bar_being_dragged.$bar.ox >= ancestor_bar.x &&
-                                bar_being_dragged.$bar.finaldx +
-                                    bar_being_dragged.$bar.ox +
-                                    bar_being_dragged.$bar.owidth >=
-                                    second_x)
-                        ) {
+                        console.log(max_x);
+                        if (min_x > ancestor_bar.$bar.ox) {
                             ancestor_bar.update_bar_position({
-                                width:
-                                    ancestor_bar.$bar.owidth +
-                                    bar_being_dragged.$bar.finaldx,
+                                x: min_x,
+                                width: max_x - min_x,
+                            });
+                        } else {
+                            ancestor_bar.update_bar_position({
+                                width: max_x - ancestor_bar.$bar.ox,
                             });
                         }
+                        ancestor_bar.date_changed();
                     }
                 });
 
