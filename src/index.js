@@ -978,7 +978,6 @@ export default class Gantt {
                                 max_x = bar.$bar.getWidth() + bar.$bar.getX();
                         }
                     );
-                    console.log(max_x);
                     if (min_x > ancestor_bar.$bar.ox) {
                         ancestor_bar.update_bar_position({
                             x: min_x,
