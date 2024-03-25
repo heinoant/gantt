@@ -1,6 +1,12 @@
 .gantt .collapsed {
   display: none;
 }
+.gantt .project .handle-group .handle {
+  display: none !important;
+}
+.gantt .tag .handle-group .handle {
+  display: none !important;
+}
 .gantt .grid-background {
   fill: none;
 }

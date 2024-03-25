@@ -1838,11 +1838,15 @@ var Gantt = (function () {
         make_bars() {
             this.bars = this.tasks.map((task) => {
                 const bar = new Bar(this, task);
+
                 return bar;
             });
             this.visible_bars = this.visible_tasks.map((task) => {
                 const bar = new Bar(this, task);
                 this.layers.bar.appendChild(bar.group);
+                if (task.type === 'project' || task.type === 'tag') {
+                    bar.group.classList.add(task.type);
+                }
                 return bar;
             });
         }
@@ -2043,11 +2047,7 @@ var Gantt = (function () {
                     const dependentTasks =
                         this.get_all_dependent_tasks(parentTaskId);
 
-                    if (parentBar.collapsed) {
-                        parentBar.collapsed = false;
-                    } else {
-                        parentBar.collapsed = true;
-                    }
+                    parentBar.collapsed = !parentBar.collapsed;
 
                     dependentTasks.forEach((task_id) => {
                         const task = this.get_task(task_id, this.tasks);

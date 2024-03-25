@@ -16,6 +16,12 @@ $handle-color: #ddd !default;
 	.collapsed{
 		display: none;
 	}
+	.project .handle-group .handle {
+			display: none !important;
+	}
+	.tag .handle-group .handle {
+			display: none !important;
+	}
 
 	.grid-background {
 		fill: none;
