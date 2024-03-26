@@ -972,6 +972,7 @@ export default class Gantt {
                     this.get_all_dependent_tasks(ancestor_bar.task.id).forEach(
                         (bar_id) => {
                             const bar = this.get_bar(bar_id);
+                            console.log(bar.$bar.getX(), min_x, max_x);
                             if (bar.$bar.getX() < min_x)
                                 min_x = bar.$bar.getX();
                             if (bar.$bar.getWidth() + bar.$bar.getX() > max_x)
@@ -979,6 +980,11 @@ export default class Gantt {
                         }
                     );
                     if (min_x > ancestor_bar.$bar.ox) {
+                        ancestor_bar.update_bar_position({
+                            x: min_x,
+                            width: max_x - min_x,
+                        });
+                    } else if (min_x < ancestor_bar.$bar.ox) {
                         ancestor_bar.update_bar_position({
                             x: min_x,
                             width: max_x - min_x,

@@ -312,18 +312,6 @@ export default class Bar {
         const bar = this.$bar;
 
         if (x) {
-            // get all x values of parent task
-            const xs = this.task.dependencies.map((dep) => {
-                return this.gantt.get_bar(dep).$bar.getX();
-            });
-            // child task must not go before parent
-            const valid_x = xs.reduce((prev, curr) => {
-                return prev && x >= curr;
-            }, true);
-            if (!valid_x && x) {
-                width = null;
-                return;
-            }
             this.update_attr(bar, 'x', x);
         }
         if (width && width >= this.gantt.options.column_width) {
