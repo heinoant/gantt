@@ -2151,7 +2151,6 @@ var Gantt = (function () {
                         this.get_all_dependent_tasks(ancestor_bar.task.id).forEach(
                             (bar_id) => {
                                 const bar = this.get_bar(bar_id);
-                                console.log(bar.$bar.getX(), min_x, max_x);
                                 if (bar.$bar.getX() < min_x)
                                     min_x = bar.$bar.getX();
                                 if (bar.$bar.getWidth() + bar.$bar.getX() > max_x)
