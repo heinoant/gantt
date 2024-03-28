@@ -217,31 +217,35 @@ export default class Bar {
         const bar = this.$bar;
         setTimeout(() => {
             const label = this.group.querySelector('.bar-label');
-            this.bar_group.classList.add('collapsable');
-            if (
-                this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
-                bar.getWidth() - label.getBBox().width > 40
-            ) {
-                const caretWidth = 12;
-                const caretHeight = 6;
-                const caretX = bar.getX() + bar.getWidth() - 20;
-                const caretY = bar.getY() + this.height / 2;
 
-                const caretPoints = [
-                    `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
-                    `${caretX},${caretY + caretHeight / 2}`,
-                    `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
-                ];
+            if (this.gantt.get_all_dependent_tasks(this.task.id).length != 0) {
+                this.bar_group.classList.add('collapsable');
+                if (bar.getWidth() - label.getBBox().width > 40) {
+                    const caretWidth = 12;
+                    const caretHeight = 6;
+                    const caretX = bar.getX() + bar.getWidth() - 20;
+                    const caretY = bar.getY() + this.height / 2;
 
-                createSVG('polygon', {
-                    points: caretPoints.join(' '),
-                    class: 'caret',
-                    append_to: this.handle_group,
-                    style:
-                        'fill: ' +
-                        this.pickColorBasedOnBG(this.task.color) +
-                        '; stroke:transparent; stroke-width:0.1rem; ',
-                });
+                    const caretPoints = [
+                        `${caretX - caretWidth / 2},${
+                            caretY - caretHeight / 2
+                        }`,
+                        `${caretX},${caretY + caretHeight / 2}`,
+                        `${caretX + caretWidth / 2},${
+                            caretY - caretHeight / 2
+                        }`,
+                    ];
+
+                    createSVG('polygon', {
+                        points: caretPoints.join(' '),
+                        class: 'caret',
+                        append_to: this.handle_group,
+                        style:
+                            'fill: ' +
+                            this.pickColorBasedOnBG(this.task.color) +
+                            '; stroke:transparent; stroke-width:0.1rem; ',
+                    });
+                }
             }
         }, 1);
     }

@@ -858,6 +858,7 @@ export default class Gantt {
 
         // Event listener for mouse move to track dragging
         $.on(this.$svg, 'mousemove', (e) => {
+            if (!action_in_progress()) return;
             if (
                 Math.abs(e.clientX - startX) > 5 ||
                 Math.abs(e.clientY - startY) > 5
@@ -873,7 +874,6 @@ export default class Gantt {
             '.collapsable, .caret',
             (e, caretElement) => {
                 if (!is_collapsable_dragging) {
-                    // Only perform collapse action on an actual click
                     this.hide_popup();
                     const parentBarWrapper =
                         caretElement.closest('.bar-wrapper');
@@ -899,6 +899,7 @@ export default class Gantt {
                                 task.visible = true;
                             }
                         });
+
                         this.refresh(this.tasks);
                     }
                 }
@@ -926,18 +927,27 @@ export default class Gantt {
                 parent_bar_id,
                 ...this.get_all_dependent_tasks(parent_bar_id),
             ];
-            bars = ids.map((id) => {
-                const bar = this.get_bar(id);
 
+            bars = ids.map((id) => {
+                let bar;
+                if (this.get_task(id).visible == false) {
+                    bar = this.get_hidden_bar(id);
+                } else {
+                    bar = this.get_bar(id);
+                }
+
+                if (!bar) return;
                 if (parent_bar_id === id) {
                     this.bar_being_dragged = bar;
                 }
+
                 const $bar = bar.$bar;
                 $bar.ox = $bar.getX();
                 $bar.oy = $bar.getY();
                 $bar.owidth = $bar.getWidth();
                 $bar.finaldx = 0;
                 $bar.finaldy = 0;
+
                 return bar;
             });
             parent_bars = this.get_all_parent_tasks(parent_bar_id).map(
@@ -955,6 +965,7 @@ export default class Gantt {
 
         $.on(this.$svg, 'mousemove', (e) => {
             if (!action_in_progress()) return;
+
             const dx = e.clientX - x_on_start;
             const dy = e.clientY - y_on_start;
 
@@ -1037,6 +1048,7 @@ export default class Gantt {
 
             // update children
             bars.forEach((bar) => {
+                if (!bar) return;
                 if (bar.task.id === parent_bar_id) {
                     return;
                 }
@@ -1077,6 +1089,7 @@ export default class Gantt {
             const dy = e.clientY - y_on_start;
             if (is_dragging || is_resizing_left || is_resizing_right) {
                 bars.forEach((bar) => {
+                    if (!bar) return;
                     bar.group.classList.remove('active');
 
                     const $bar = bar.$bar;
@@ -1268,6 +1281,12 @@ export default class Gantt {
 
     get_bar(id) {
         return this.visible_bars.find((bar) => {
+            return bar.task.id === id;
+        });
+    }
+
+    get_hidden_bar(id) {
+        return this.bars.find((bar) => {
             return bar.task.id === id;
         });
     }

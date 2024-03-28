@@ -719,31 +719,35 @@ var Gantt = (function () {
             const bar = this.$bar;
             setTimeout(() => {
                 const label = this.group.querySelector('.bar-label');
-                this.bar_group.classList.add('collapsable');
-                if (
-                    this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
-                    bar.getWidth() - label.getBBox().width > 40
-                ) {
-                    const caretWidth = 12;
-                    const caretHeight = 6;
-                    const caretX = bar.getX() + bar.getWidth() - 20;
-                    const caretY = bar.getY() + this.height / 2;
 
-                    const caretPoints = [
-                        `${caretX - caretWidth / 2},${caretY - caretHeight / 2}`,
-                        `${caretX},${caretY + caretHeight / 2}`,
-                        `${caretX + caretWidth / 2},${caretY - caretHeight / 2}`,
-                    ];
+                if (this.gantt.get_all_dependent_tasks(this.task.id).length != 0) {
+                    this.bar_group.classList.add('collapsable');
+                    if (bar.getWidth() - label.getBBox().width > 40) {
+                        const caretWidth = 12;
+                        const caretHeight = 6;
+                        const caretX = bar.getX() + bar.getWidth() - 20;
+                        const caretY = bar.getY() + this.height / 2;
 
-                    createSVG('polygon', {
-                        points: caretPoints.join(' '),
-                        class: 'caret',
-                        append_to: this.handle_group,
-                        style:
-                            'fill: ' +
-                            this.pickColorBasedOnBG(this.task.color) +
-                            '; stroke:transparent; stroke-width:0.1rem; ',
-                    });
+                        const caretPoints = [
+                            `${caretX - caretWidth / 2},${
+                            caretY - caretHeight / 2
+                        }`,
+                            `${caretX},${caretY + caretHeight / 2}`,
+                            `${caretX + caretWidth / 2},${
+                            caretY - caretHeight / 2
+                        }`,
+                        ];
+
+                        createSVG('polygon', {
+                            points: caretPoints.join(' '),
+                            class: 'caret',
+                            append_to: this.handle_group,
+                            style:
+                                'fill: ' +
+                                this.pickColorBasedOnBG(this.task.color) +
+                                '; stroke:transparent; stroke-width:0.1rem; ',
+                        });
+                    }
                 }
             }, 1);
         }
@@ -2037,6 +2041,7 @@ var Gantt = (function () {
 
             // Event listener for mouse move to track dragging
             $.on(this.$svg, 'mousemove', (e) => {
+                if (!action_in_progress()) return;
                 if (
                     Math.abs(e.clientX - startX) > 5 ||
                     Math.abs(e.clientY - startY) > 5
@@ -2052,7 +2057,6 @@ var Gantt = (function () {
                 '.collapsable, .caret',
                 (e, caretElement) => {
                     if (!is_collapsable_dragging) {
-                        // Only perform collapse action on an actual click
                         this.hide_popup();
                         const parentBarWrapper =
                             caretElement.closest('.bar-wrapper');
@@ -2078,6 +2082,7 @@ var Gantt = (function () {
                                     task.visible = true;
                                 }
                             });
+
                             this.refresh(this.tasks);
                         }
                     }
@@ -2105,18 +2110,27 @@ var Gantt = (function () {
                     parent_bar_id,
                     ...this.get_all_dependent_tasks(parent_bar_id),
                 ];
-                bars = ids.map((id) => {
-                    const bar = this.get_bar(id);
 
+                bars = ids.map((id) => {
+                    let bar;
+                    if (this.get_task(id).visible == false) {
+                        bar = this.get_hidden_bar(id);
+                    } else {
+                        bar = this.get_bar(id);
+                    }
+
+                    if (!bar) return;
                     if (parent_bar_id === id) {
                         this.bar_being_dragged = bar;
                     }
+
                     const $bar = bar.$bar;
                     $bar.ox = $bar.getX();
                     $bar.oy = $bar.getY();
                     $bar.owidth = $bar.getWidth();
                     $bar.finaldx = 0;
                     $bar.finaldy = 0;
+
                     return bar;
                 });
                 parent_bars = this.get_all_parent_tasks(parent_bar_id).map(
@@ -2134,6 +2148,7 @@ var Gantt = (function () {
 
             $.on(this.$svg, 'mousemove', (e) => {
                 if (!action_in_progress()) return;
+
                 const dx = e.clientX - x_on_start;
                 const dy = e.clientY - y_on_start;
 
@@ -2216,6 +2231,7 @@ var Gantt = (function () {
 
                 // update children
                 bars.forEach((bar) => {
+                    if (!bar) return;
                     if (bar.task.id === parent_bar_id) {
                         return;
                     }
@@ -2256,6 +2272,7 @@ var Gantt = (function () {
                 const dy = e.clientY - y_on_start;
                 if (is_dragging || is_resizing_left || is_resizing_right) {
                     bars.forEach((bar) => {
+                        if (!bar) return;
                         bar.group.classList.remove('active');
 
                         const $bar = bar.$bar;
@@ -2447,6 +2464,12 @@ var Gantt = (function () {
 
         get_bar(id) {
             return this.visible_bars.find((bar) => {
+                return bar.task.id === id;
+            });
+        }
+
+        get_hidden_bar(id) {
+            return this.bars.find((bar) => {
                 return bar.task.id === id;
             });
         }
