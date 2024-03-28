@@ -464,7 +464,9 @@ export default class Bar {
     }
 
     update_underlying_bar_position() {
+        if (this.invalid) return;
         const underBar = this.group.querySelector('.bar');
+        if (!this.$bar || !underBar) return;
 
         underBar.setAttribute('x', this.$bar.getX());
         underBar.setAttribute('y', this.$bar.getY());
