@@ -217,7 +217,7 @@ export default class Bar {
         const bar = this.$bar;
         setTimeout(() => {
             const label = this.group.querySelector('.bar-label');
-
+            this.bar_group.classList.add('collapsable');
             if (
                 this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
                 bar.getWidth() - label.getBBox().width > 40
@@ -270,7 +270,7 @@ export default class Bar {
                 return;
             }
 
-            this.show_popup();
+            //this.show_popup();
             this.gantt.unselect_all();
             this.group.classList.add('active');
         });

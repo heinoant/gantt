@@ -719,7 +719,7 @@ var Gantt = (function () {
             const bar = this.$bar;
             setTimeout(() => {
                 const label = this.group.querySelector('.bar-label');
-
+                this.bar_group.classList.add('collapsable');
                 if (
                     this.gantt.get_all_dependent_tasks(this.task.id).length != 0 &&
                     bar.getWidth() - label.getBBox().width > 40
@@ -772,7 +772,7 @@ var Gantt = (function () {
                     return;
                 }
 
-                this.show_popup();
+                //this.show_popup();
                 this.gantt.unselect_all();
                 this.group.classList.add('active');
             });
@@ -1959,7 +1959,7 @@ var Gantt = (function () {
             // add
             $.on(this.$svg, 'mousedown', '.grid-row, .today-highlight', (e) => {
                 is_dragging = true;
-                x_on_start = e.offsetX;
+                x_on_start = e.clientX;
                 if (this.$svg.parentElement) {
                     this.$svg.parentElement.style.cursor = 'move';
                 }
@@ -1968,12 +1968,12 @@ var Gantt = (function () {
                 if (!is_dragging) {
                     return;
                 }
-                const dx = e.offsetX - x_on_start;
+                const dx = e.clientX - x_on_start;
                 const parent_element = this.$svg.parentElement;
                 if (!parent_element) return;
                 parent_element.style.cursor = 'move';
                 parent_element.scrollLeft -= dx * 1.5;
-                x_on_start = e.offsetX;
+                x_on_start = e.clientX;
             });
 
             document.addEventListener('mouseup', (e) => {
@@ -2025,33 +2025,64 @@ var Gantt = (function () {
             function action_in_progress() {
                 return is_dragging || is_resizing_left || is_resizing_right;
             }
-            // Event listener for clicking on a caret. Toggles collapse
-            $.on(this.$svg, 'click', '.caret', (e, caretElement) => {
-                this.hide_popup();
-                const parentBarWrapper = caretElement.closest('.bar-wrapper');
-                if (parentBarWrapper) {
-                    const parentTaskId = parentBarWrapper.getAttribute('data-id');
-                    const parentBar = this.get_task(parentTaskId);
-                    const dependentTasks =
-                        this.get_all_dependent_tasks(parentTaskId);
+            let is_collapsable_dragging = false;
+            let startX, startY;
 
-                    parentBar.collapsed = !parentBar.collapsed;
+            // Event listener for mouse down to track dragging
+            $.on(this.$svg, 'mousedown', '.collapsable, .caret', (e) => {
+                is_collapsable_dragging = false;
+                startX = e.clientX;
+                startY = e.clientY;
+            });
 
-                    dependentTasks.forEach((task_id) => {
-                        const task = this.get_task(task_id, this.tasks);
-
-                        if (
-                            parentBar.collapsed == true ||
-                            this.get_task(task.dependencies[0]).collapsed == true
-                        ) {
-                            task.visible = false;
-                        } else {
-                            task.visible = true;
-                        }
-                    });
-                    this.refresh(this.tasks);
+            // Event listener for mouse move to track dragging
+            $.on(this.$svg, 'mousemove', (e) => {
+                if (
+                    Math.abs(e.clientX - startX) > 5 ||
+                    Math.abs(e.clientY - startY) > 5
+                ) {
+                    is_collapsable_dragging = true;
                 }
             });
+
+            // Event listener for mouse up to check if it's a click or a drag
+            $.on(
+                this.$svg,
+                'mouseup',
+                '.collapsable, .caret',
+                (e, caretElement) => {
+                    if (!is_collapsable_dragging) {
+                        // Only perform collapse action on an actual click
+                        this.hide_popup();
+                        const parentBarWrapper =
+                            caretElement.closest('.bar-wrapper');
+                        if (parentBarWrapper) {
+                            const parentTaskId =
+                                parentBarWrapper.getAttribute('data-id');
+                            const parentBar = this.get_task(parentTaskId);
+                            const dependentTasks =
+                                this.get_all_dependent_tasks(parentTaskId);
+
+                            parentBar.collapsed = !parentBar.collapsed;
+
+                            dependentTasks.forEach((task_id) => {
+                                const task = this.get_task(task_id, this.tasks);
+
+                                if (
+                                    parentBar.collapsed == true ||
+                                    this.get_task(task.dependencies[0]).collapsed ==
+                                        true
+                                ) {
+                                    task.visible = false;
+                                } else {
+                                    task.visible = true;
+                                }
+                            });
+                            this.refresh(this.tasks);
+                        }
+                    }
+                }
+            );
 
             $.on(this.$svg, 'mousedown', '.bar-wrapper, .handle', (e, element) => {
                 const bar_wrapper = $.closest('.bar-wrapper', element);
@@ -2066,8 +2097,8 @@ var Gantt = (function () {
 
                 bar_wrapper.classList.add('active');
 
-                x_on_start = e.offsetX;
-                y_on_start = e.offsetY;
+                x_on_start = e.clientX;
+                y_on_start = e.clientY;
 
                 parent_bar_id = bar_wrapper.getAttribute('data-id');
                 const ids = [
@@ -2076,6 +2107,7 @@ var Gantt = (function () {
                 ];
                 bars = ids.map((id) => {
                     const bar = this.get_bar(id);
+
                     if (parent_bar_id === id) {
                         this.bar_being_dragged = bar;
                     }
@@ -2102,8 +2134,8 @@ var Gantt = (function () {
 
             $.on(this.$svg, 'mousemove', (e) => {
                 if (!action_in_progress()) return;
-                const dx = e.offsetX - x_on_start;
-                const dy = e.offsetY - y_on_start;
+                const dx = e.clientX - x_on_start;
+                const dy = e.clientY - y_on_start;
 
                 this.hide_popup();
 
@@ -2151,10 +2183,16 @@ var Gantt = (function () {
                         this.get_all_dependent_tasks(ancestor_bar.task.id).forEach(
                             (bar_id) => {
                                 const bar = this.get_bar(bar_id);
-                                if (bar.$bar.getX() < min_x)
-                                    min_x = bar.$bar.getX();
-                                if (bar.$bar.getWidth() + bar.$bar.getX() > max_x)
-                                    max_x = bar.$bar.getWidth() + bar.$bar.getX();
+                                if (bar) {
+                                    if (bar.$bar.getX() < min_x)
+                                        min_x = bar.$bar.getX();
+                                    if (
+                                        bar.$bar.getWidth() + bar.$bar.getX() >
+                                        max_x
+                                    )
+                                        max_x =
+                                            bar.$bar.getWidth() + bar.$bar.getX();
+                                }
                             }
                         );
                         if (min_x > ancestor_bar.$bar.ox) {
@@ -2215,7 +2253,7 @@ var Gantt = (function () {
             });
 
             document.addEventListener('mouseup', (e) => {
-                const dy = e.offsetY - y_on_start;
+                const dy = e.clientY - y_on_start;
                 if (is_dragging || is_resizing_left || is_resizing_right) {
                     bars.forEach((bar) => {
                         bar.group.classList.remove('active');
@@ -2262,8 +2300,8 @@ var Gantt = (function () {
 
             $.on(this.$svg, 'mousedown', '.handle.progress', (e, handle) => {
                 is_resizing = true;
-                x_on_start = e.offsetX;
-                y_on_start = e.offsetY;
+                x_on_start = e.clientX;
+                y_on_start = e.clientY;
 
                 const $bar_wrapper = $.closest('.bar-wrapper', handle);
                 const id = $bar_wrapper.getAttribute('data-id');
@@ -2280,8 +2318,8 @@ var Gantt = (function () {
 
             $.on(this.$svg, 'mousemove', (e) => {
                 if (!is_resizing) return;
-                let dx = e.offsetX - x_on_start;
-                e.offsetY - y_on_start;
+                let dx = e.clientX - x_on_start;
+                e.clientY - y_on_start;
 
                 if (dx > $bar_progress.max_dx) {
                     dx = $bar_progress.max_dx;
