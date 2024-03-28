@@ -606,7 +606,7 @@ var Gantt = (function () {
         }
 
         draw_bar_pattern() {
-            this.$bar = createSVG('rect', {
+            this.$bar_pattern = createSVG('rect', {
                 x: this.x,
                 y: this.y,
                 width: this.width,
@@ -618,10 +618,10 @@ var Gantt = (function () {
                 style: 'fill: ' + this.pickStripeColorBasedOnBG(this.task.color),
             });
 
-            animateSVG(this.$bar, 'width', 0, this.width);
+            animateSVG(this.$bar_pattern, 'width', 0, this.width);
 
             if (this.invalid) {
-                this.$bar.classList.add('bar-invalid');
+                this.$bar_pattern.classList.add('bar-invalid');
             }
         }
 
@@ -816,15 +816,19 @@ var Gantt = (function () {
 
         update_bar_position({ x = null, width = null, y = null }) {
             const bar = this.$bar;
+            const bar_pattern = this.$bar_pattern;
 
             if (x) {
                 this.update_attr(bar, 'x', x);
+                this.update_attr(bar_pattern, 'x', x);
             }
             if (width && width >= this.gantt.options.column_width) {
                 this.update_attr(bar, 'width', width);
+                this.update_attr(bar_pattern, 'width', width);
             }
             if (y) {
                 this.update_attr(bar, 'y', y);
+                this.update_attr(bar_pattern, 'y', y);
             }
             this.update_label_position();
             this.update_handle_position();
@@ -956,7 +960,8 @@ var Gantt = (function () {
         }
 
         update_progressbar_position() {
-            if (this.invalid) return;
+            if (this.invalid || !this.task.progress) return;
+
             this.$bar_progress.setAttribute('x', this.$bar.getX());
             this.$bar_progress.setAttribute('y', this.$bar.getY());
             this.$bar_progress.setAttribute(
@@ -968,7 +973,6 @@ var Gantt = (function () {
         update_underlying_bar_position() {
             if (this.invalid) return;
             const underBar = this.group.querySelector('.bar');
-            if (!this.$bar || !underBar) return;
 
             underBar.setAttribute('x', this.$bar.getX());
             underBar.setAttribute('y', this.$bar.getY());
